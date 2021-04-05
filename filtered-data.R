@@ -22,3 +22,15 @@ length(unique(data$TaxonomicName)) # 335
 
 # Saving data
 save(data, file = "data/data.RData")
+
+# WHY PEARLY WRASSE?
+
+# Find species with maximum observations
+which.max(speciesCount$n) # 329
+speciesCount[329,] # Trachurus novaezelandiae 914584
+
+# Find species with minimum observations
+which.min(speciesCount$n) # 142
+speciesCount[142,] # Halichoeres margaritaceus  1008
+
+# Smallest number observations makes it easier for analysis.
