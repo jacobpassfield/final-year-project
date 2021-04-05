@@ -17,5 +17,8 @@ selected_data <- main_data %>%
 # Renaming selected data as data
 data <- selected_data
 
+# Confirm there are 335 species
+length(unique(data$TaxonomicName)) # 335
+
 # Saving data
 save(data, file = "data/data.RData")
