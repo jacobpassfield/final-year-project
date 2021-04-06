@@ -10,7 +10,7 @@ load(file = "data/data.RData")
 # coordinates. Find the average longitude and latitude cordinates for each geogroup.
 lonlat_data <- data %>%
   group_by(Geogroup) %>%
-  summarise(Latitude = mean(SiteLat), Longitude = mean(SiteLong))
+  summarise(Latitude = mean(SiteLat), Longitude = mean(SiteLong), records = n())
 
 # Find minimum and maximum longitude and latitude coordinates to aid the 
 # creation of a bounding box.
@@ -38,8 +38,10 @@ lonlatAus <- lonlat_data %>%
   filter(bbox[1] <= Longitude, Longitude <= bbox[3], bbox[2] <= Latitude, Latitude <= bbox[4])
 # Overlaying geogroups onto map
 ausMap +
-  geom_point(aes(x = Longitude, y = Latitude), shape = 8, size = 3, colour = "red", data = lonlatAus) +
-  theme(legend.position="none")
+  geom_point(aes(x = Longitude, y = Latitude, size = records), shape = 20, colour = "red", data = lonlatAus) +
+  scale_size(range = c(1, 5), name="Number of records") +
+  theme(legend.position="bottom")
+
 
 # SAVE MAP
 
@@ -48,8 +50,9 @@ pdf(file = "MapOfAustralia.pdf")
 
 # Create the plot
 ausMap +
-  geom_point(aes(x = Longitude, y = Latitude), shape = 8, size = 3, colour = "red", data = lonlatAus) + 
-  theme(legend.position="none")
+  geom_point(aes(x = Longitude, y = Latitude, size = records), shape = 20, colour = "red", data = lonlatAus) +
+  scale_size(range = c(1, 5), name="Number of records") +
+  theme(legend.position="bottom")
 
 # Create the file
 dev.off()
