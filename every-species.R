@@ -149,8 +149,51 @@ plot(AG_data$ScaledMeanSST, E, xlab = "ScaledMeanSST", ylab= "Residuals")
 # Dim
 # Statitsics
 
+# ROUNDED ESTIMATES TO A WHOLE NUMBER
 
+SST_est$round_est <- round(SST_est$estimate, digits =  0)
 
+# Temperature doesn't have a large range so the slope won't drastically change the 
+# body size if slope isn't drastic.
+
+nrow(subset(SST_est, round_est > 0)) # 105
+nrow(subset(SST_est, round_est == 0)) # 59
+nrow(subset(SST_est, round_est < 0)) # 171
+
+# INCREASE
+(105/335)*100 # 31.34328
+# NEITHER INCREASE NOR DECREASE
+(59/335)*100 # 17.61194
+# DECREASE
+(171/335)*100 # 51.04478
+
+# ROUNDED ESTIMATES TO THE NEAREST TENTH
+
+SST_est$round_est <- round(SST_est$estimate, digits =  0.5)
+
+nrow(subset(SST_est, round_est > 0)) # 129
+nrow(subset(SST_est, round_est == 0)) # 7
+nrow(subset(SST_est, round_est < 0)) # 199
+
+# INCREASE
+(129/335)*100 # 38.50746
+# NEITHER INCREASE NOR DECREASE
+(7/335)*100 # 2.089552
+# DECREASE
+(199/335)*100 # 59.40299
+
+# ESTIMATES LEFT ALONE
+
+nrow(subset(SST_est, estimate > 0)) # 132
+nrow(subset(SST_est, estimate == 0)) # 0
+nrow(subset(SST_est, estimate < 0)) # 203
+
+# INCREASE
+(132/335)*100 # 39.40299
+# NEITHER INCREASE NOR DECREASE
+(0/335)*100 # 0
+# DECREASE
+(203/335)*100 # 60.59701
 
 
 
