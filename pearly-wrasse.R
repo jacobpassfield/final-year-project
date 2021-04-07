@@ -1,6 +1,10 @@
+# https://viz-ggplot2.rsquaredacademy.com/textann.html
+# https://ggplot2-book.org/layers.html
+
 # Loading necessary libraries
 library(tidyverse)
 library(ggplot2)
+library(broom)
 library(nlme)
 library(lme4)
 library(ggeffects)
@@ -42,7 +46,7 @@ ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass)) +
 
 # Model validation
 # Homogeneity.
-plot(PW.lm1, which=1)
+plot(PW.lm1, which=1) + text(8.4, 9.7, "A", font = 2, cex = 1.5, col = "red")
 # Should be flat.
 E1 <- resid(PW.lm1)
 # Normality.
@@ -53,10 +57,10 @@ E1 <- resid(PW.lm1)
 #  geom_line(group=1) +
 #  scale_y_continuous(labels = scales::comma) + 
 #  theme_classic()
-hist(E1, xlab = "Residuals", main = "")
-plot(PW.lm1, which=2)
+hist(E1, xlab = "Residuals", main = "") + text(-3.5, 250, "B", cex = 1.5, font = 2, col = "red")
+plot(PW.lm1, which=2) + text(-2.5, 3.5, "C", cex = 1.5, font = 2, col = "red")
 # Independence.
-plot(PW_data$MeanSST, E1, xlab = "MeanSST", ylab= "Residuals")
+plot(PW_data$MeanSST, E1, xlab = "MeanSST", ylab= "Residuals") + text(21, 8.5, "D", cex = 1.5, font = 2, col = "red")
 
 # Where to go from here?
 # Inspect the spread of data for geogroup, surveyID and yearas included in the reference article.
@@ -99,6 +103,7 @@ ggplot(PW_data, aes(x=Year, y=SizeClass)) +
 ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass, colour=Geogroup)) +
   labs(y="Size class (cm)", x="Scaled mean SST (°C)") +
   geom_point() + 
+  annotate(geom = "text", x = -3, y = 14, label = "A", fontface = 2, colour = "red", size = 6) +
   theme_classic() + 
   theme(legend.position="none")
 # Pink dots fall to the right on the horixontal axis.
@@ -107,12 +112,14 @@ ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass, colour=Geogroup)) +
 ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass, colour=SurveyID)) +
   labs(y="Size class (cm)", x="Scaled mean SST (°C)") +
   geom_point() + 
+  annotate(geom = "text", x = -3, y = 14, label = "B", fontface = 2, colour = "red", size = 6) +
   theme_classic() + 
   theme(legend.position="none")
 # YEAR
 ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass, colour=Year)) +
   labs(y="Size class (cm)", x="Scaled mean SST (°C)") +
   geom_point() + 
+  annotate(geom = "text", x = -3, y = 14, label = "C", fontface = 2, colour = "red", size = 6) +
   theme_classic() + 
   theme(legend.position="none")
 # We'd have to fun 37 seperate anslyses, that's 74 (111) and adding the effects of SurveyIndex,
@@ -197,12 +204,13 @@ ggplot(PW.pred.mm) +
 
 # Homogeneity.
 plot(PW.mm, which=1)
+text(-4.5, 175, label = "B", font = 2, cex = 1.5, col = "red")
 # Should be flat.
 E3 <- resid(PW.mm)
 # Normality.
-hist(E3, xlab = "Residuals", main = "")
+hist(E3, xlab = "Residuals", main = "") + text(-4.5, 175, label = "B", font = 2, cex = 1.5, col = "red")
 # Independence.
-plot(PW_data$ScaledMeanSST, E3, xlab = "ScaledMeanSST", ylab= "Residuals")
+plot(PW_data$ScaledMeanSST, E3, xlab = "ScaledMeanSST", ylab= "Residuals") + text(-2.7, 6, "C", font = 2, cex = 1.5, col = "red")
 
 summary(PW.mm)
 
