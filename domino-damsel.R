@@ -13,19 +13,10 @@ TSD_data <- data %>% filter(TaxonomicName %in% "Dascyllus trimaculatus")
 
 TSD_data <- TSD_data %>% mutate(ScaledMeanSST = scale(MeanSST, center = T, scale = T))
 
-TSD_data <- TSD_data %>% 
-  mutate(SurveyDate = as.Date(paste(Year, Month, Day, sep = "-")),
-         Survey = paste(Geogroup, SurveyDate, sep = "/")) %>%
-  arrange(Geogroup, Survey) %>%
-  mutate(GeoIndex = as.integer(factor(Geogroup))) %>%
-  mutate(YearIndex = as.integer(factor(Year))) %>%
-  mutate(SurveyIndex = as.integer(factor(Survey)))
+TSD_data$Geogroup <- factor(TSD_data$Geogroup)
+TSD_data$SurveyID <- factor(TSD_data$SurveyID)
 
-TSD_data$GeoIndex <- factor(TSD_data$GeoIndex)
-TSD_data$SurveyIndex <- factor(TSD_data$SurveyIndex)
-TSD_data$YearIndex <- factor(TSD_data$YearIndex)
-
-TSD.mm <- lmer(SizeClass ~ ScaledMeanSST + (1|GeoIndex/SurveyIndex), data = TSD_data, REML = T)
+TSD.mm <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup/SurveyID), REML = T, data = TSD_data)
 
 TSD.pred.mm <- ggpredict(TSD.mm, terms = c("ScaledMeanSST"))  # this gives overall predictions for the model
 
@@ -39,7 +30,7 @@ ggplot(TSD.pred.mm) +
        title = "How temperature affects the body size of Domino Damsel") + 
   theme_minimal() + 
   theme(legend.position="none")
-# Increase!
+# Slight increase!
 
 # Homogeneity.
 plot(TSD.mm, which=1)

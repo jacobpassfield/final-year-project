@@ -63,36 +63,30 @@ plot(PW_data$MeanSST, E1, xlab = "MeanSST", ylab= "Residuals")
 # The specific values of them do not matter in this analysis, only how they group the data.
 # Index them.
 
-PW_data <- PW_data %>% 
-  mutate(SurveyDate = as.Date(paste(Year, Month, Day, sep = "-")),
-         Survey = paste(Geogroup, SurveyDate, sep = "/")) %>%
-  arrange(Geogroup, Survey) %>%
-  mutate(GeoIndex = as.integer(factor(Geogroup))) %>%
-  mutate(YearIndex = as.integer(factor(Year))) %>%
-  mutate(SurveyIndex = as.integer(factor(Survey)))
-
 # Nomial variables so factor.
-PW_data$GeoIndex <- factor(PW_data$GeoIndex)
-PW_data$SurveyIndex <- factor(PW_data$SurveyIndex)
-PW_data$YearIndex <- factor(PW_data$YearIndex)
+PW_data$Geogroup <- factor(PW_data$Geogroup)
+PW_data$SurveyID <- factor(PW_data$SurveyID)
+PW_data$Year <- factor(PW_data$Year)
+
+str(PW_data)
 
 # Boxplot
 # Use ggplot2 so we can swap axis labels
 # GEOGROUP
-ggplot(PW_data, aes(x=GeoIndex, y=SizeClass)) +
+ggplot(PW_data, aes(x=Geogroup, y=SizeClass)) +
   labs(y="Size class (cm)", x="Geogroup") +
   geom_boxplot() + 
   theme_classic() +
   coord_flip()
 # SURVEY
-ggplot(PW_data, aes(x=SurveyIndex, y=SizeClass)) +
-  labs(y="Size class (cm)", x="Geogroup") +
+ggplot(PW_data, aes(x=SurveyID, y=SizeClass)) +
+  labs(y="Size class (cm)", x="SurveyID") +
   geom_boxplot() + 
   theme_classic() +
   coord_flip()
 # YEAR
-ggplot(PW_data, aes(x=YearIndex, y=SizeClass)) +
-  labs(y="Size class (cm)", x="Geogroup") +
+ggplot(PW_data, aes(x=Year, y=SizeClass)) +
+  labs(y="Size class (cm)", x="Year") +
   geom_boxplot() + 
   theme_classic() +
   coord_flip()
@@ -102,22 +96,22 @@ ggplot(PW_data, aes(x=YearIndex, y=SizeClass)) +
 
 # To illustrate further, we run sepearte analyses.
 # GEOGROUP
-ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass, colour=GeoIndex)) +
-  labs(y="Log-transformed size class (cm)", x="Scaled mean SST (°C)") +
+ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass, colour=Geogroup)) +
+  labs(y="Size class (cm)", x="Scaled mean SST (°C)") +
   geom_point() + 
   theme_classic() + 
   theme(legend.position="none")
 # Pink dots fall to the right on the horixontal axis.
 # Orange dots fall to the left.
 # SURVEY
-ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass, colour=SurveyIndex)) +
-  labs(y="Log-transformed size class (cm)", x="Scaled mean SST (°C)") +
+ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass, colour=SurveyID)) +
+  labs(y="Size class (cm)", x="Scaled mean SST (°C)") +
   geom_point() + 
   theme_classic() + 
   theme(legend.position="none")
 # YEAR
-ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass, colour=YearIndex)) +
-  labs(y="Log-transformed size class (cm)", x="Scaled mean SST (°C)") +
+ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass, colour=Year)) +
+  labs(y="Size class (cm)", x="Scaled mean SST (°C)") +
   geom_point() + 
   theme_classic() + 
   theme(legend.position="none")
@@ -129,60 +123,63 @@ ggplot(PW_data, aes(x=ScaledMeanSST, y=SizeClass, colour=YearIndex)) +
 # MIXED EFFECTS MODELLING
 
 # Using nlme
-f1 <- formula(SizeClass ~ ScaledMeanSST)
-PW.lm1 <- gls(f1, method = "REML", data = PW_data) # use gls in order to compare models
-PW.mm1 <- lme(f1, random = ~1 | GeoIndex / SurveyIndex,
-          data = PW_data, method = "REML")
-anova(PW.lm1, PW.mm1)
+# f1 <- formula(SizeClass ~ ScaledMeanSST)
+# lm <- gls(f1, method = "REML", data = PW_data) # use gls in order to compare models
+# mm <- lme(f1, random = ~1 | GeoIndex / SurveyIndex, data = PW_data, method = "REML")
+# anova(PW.lm1, PW.mm1)
 #        Model df      AIC      BIC    logLik   Test  L.Ratio p-value
 # PW.lm1     1  3 4748.695 4763.436 -2371.347                        
 # PW.mm1     2  5 4360.609 4385.178 -2175.305 1 vs 2 392.0856  <.0001
 # Validation
 # Homogeneity.
-plot(PW.mm1, which=1)
+# plot(PW.mm1, which=1)
 # Should be flat.
-E2 <- resid(PW.mm1)
+# E2 <- resid(PW.mm1)
 # Normality.
-hist(E2, xlab = "Residuals", main = "")
-plot(PW.mm1, which=2)
+# hist(E2, xlab = "Residuals", main = "")
+# plot(PW.mm1, which=2)
 # Independence.
-plot(PW_data$ScaledMeanSST, E2, xlab = "ScaledMeanSST", ylab= "Residuals")
+# plot(PW_data$ScaledMeanSST, E2, xlab = "ScaledMeanSST", ylab= "Residuals")
 
-PW.mm2  <- lmer(SizeClass ~ ScaledMeanSST + (1|GeoIndex), data = PW_data, REML = T)
-PW.mm3  <- lmer(SizeClass ~ ScaledMeanSST + (1|YearIndex), data = PW_data, REML = T)
-PW.mm4  <- lmer(SizeClass ~ ScaledMeanSST + (1|SurveyIndex), data = PW_data, REML = T)
- 
-PW.mm5  <- lmer(SizeClass ~ ScaledMeanSST + (1|GeoIndex) + (1|YearIndex) + (1|SurveyIndex), data = PW_data, REML = T)
-PW.mm6  <- lmer(SizeClass ~ ScaledMeanSST + (1|GeoIndex) + (1|SurveyIndex), data = PW_data, REML = T)
-PW.mm7  <- lmer(SizeClass ~ ScaledMeanSST + (1|GeoIndex) + (1|YearIndex), data = PW_data, REML = T)
-PW.mm8  <- lmer(SizeClass ~ ScaledMeanSST + (1|YearIndex) + (1|SurveyIndex), data = PW_data, REML = T)
+mm1  <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup), REML = T, data = PW_data)
+mm2  <- lmer(SizeClass ~ ScaledMeanSST + (1|Year), REML = T, data = PW_data)
+mm3  <- lmer(SizeClass ~ ScaledMeanSST + (1|SurveyID), REML = T, data = PW_data)
 
-PW.mm9  <- lmer(SizeClass ~ ScaledMeanSST + (1|GeoIndex/YearIndex/SurveyIndex), data = PW_data, REML = T)
-PW.mm10 <- lmer(SizeClass ~ ScaledMeanSST + (1|GeoIndex/SurveyIndex), data = PW_data, REML = T)
-PW.mm11 <- lmer(SizeClass ~ ScaledMeanSST + (1|GeoIndex/YearIndex), data = PW_data, REML = T)
-PW.mm12 <- lmer(SizeClass ~ ScaledMeanSST + (1|YearIndex/SurveyIndex), data = PW_data, REML = T)
+mm4  <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup) + (1|Year) + (1|SurveyID), REML = T, data = PW_data)
+mm5  <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup) + (1|SurveyID), REML = T, data = PW_data)
+mm6  <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup) + (1|Year), REML = T, data = PW_data)
+mm7  <- lmer(SizeClass ~ ScaledMeanSST + (1|Year) + (1|SurveyID), REML = T, data = PW_data)
 
-BIC(PW.mm2, PW.mm3, PW.mm4, PW.mm5, PW.mm6, PW.mm7, PW.mm8, PW.mm9, PW.mm10, PW.mm11, PW.mm12)
+mm8  <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup/Year/SurveyID), REML = T, data = PW_data)
+# Failed to converge
+mm9 <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup/SurveyID), REML = T, data = PW_data)
+mm10 <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup/Year), REML = T, data = PW_data)
+mm11 <- lmer(SizeClass ~ ScaledMeanSST + (1|Year/SurveyID), REML = T, data = PW_data)
 
-#         df      BIC
-# PW.mm2   4 4416.070
-# PW.mm3   4 4747.702
-# PW.mm4   4 4382.043
-# PW.mm5   6 4391.323
-# PW.mm6   5 4385.188
-# PW.mm7   5 4405.636
-# PW.mm8   5 4388.283
-# PW.mm9   6 4387.722
-# PW.mm10  5 4385.188
-# PW.mm11  5 4394.367
-# PW.mm12  5 4388.283
+BIC(mm1, mm2, mm3, mm4, mm5, mm6, mm7, mm9, mm10, mm11)
 
-# PW.mm6, PW.mm10
-# It is nested. So PW.mm10. 
+#      df      BIC
+# mm1   4 4416.070
+# mm2   4 4747.702
+# mm3   4 4375.641
+# mm4   6 4372.073
+# mm5   5 4369.391 <- 
+# mm6   5 4405.636
+# mm7   5 4380.878
+# mm9   5 4369.391 <-
+# mm10  5 4394.367
+# mm11  5 4380.878
+
+summary(mm5)
+summary(mm9)
+
+# mm5, mm9
+# It is nested. So mm9 
 # Makes sense YearIndex is not used as spread wasn't drastically different.
+# Interesting about MM3 < MM1 Geogroup too but survey index encapsulates day and geogroup
 
-PW.mm <- PW.mm10
-PW.pred.mm <- ggpredict(PW.mm10, terms = c("ScaledMeanSST"))  
+PW.mm <- mm9
+PW.pred.mm <- ggpredict(PW.mm, terms = c("ScaledMeanSST"))  
 # this gives overall predictions for the model
 
 # Plot the predictions 
