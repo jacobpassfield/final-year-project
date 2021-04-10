@@ -23,14 +23,39 @@ length(unique(data$TaxonomicName)) # 335
 # Saving data
 save(data, file = "data/data.RData")
 
+# How many...
+# Geogroups?
+length(unique(data$Geogroup)) # 284
+# Surveys?
+length(unique(data$SurveyID)) # 21140
+
+# Values of size class?
+sort(unique(data$SizeClass))
+# 2.5 5.0 7.5 10.0 12.5 15.0 20.0 25.0 30.0 35.0 37.5 40.0 50.0 62.5 75.0 87.5 90.0
+# 100.0 112.5 125.0 137.5 150.0 162.5 175.0 187.5
+
+# Smallest MeanSST?
+min(data$MeanSST) # 12.98137
+# Largest?
+max(data$MeanSST) # 29.3511
+
+# Range of Year
+sort(unique(data$Year))
+# 1992 1993 1994 1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010
+# 2011 2012 2013 2014 2015 2016 2017 2018
+
 # WHY PEARLY WRASSE?
 
+speciesCount <- data %>%
+  group_by(TaxonomicName) %>%
+  summarise(count = n())
+
 # Find species with maximum observations
-which.max(speciesCount$n) # 329
+which.max(speciesCount$count) # 329
 speciesCount[329,] # Trachurus novaezelandiae 914584
 
 # Find species with minimum observations
-which.min(speciesCount$n) # 142
+which.min(speciesCount$count) # 142
 speciesCount[142,] # Halichoeres margaritaceus  1008
 
 # Smallest number observations makes it easier for analysis.

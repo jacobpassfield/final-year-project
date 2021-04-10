@@ -39,30 +39,22 @@ lonlatAus <- lonlat_data %>%
 # Overlaying geogroups onto map
 ausMap +
   geom_point(aes(x = Longitude, y = Latitude, size = records), shape = 20, colour = "red", data = lonlatAus) +
-  scale_size(range = c(1, 5), name="Number of records") +
+  scale_size(range = c(1, 15), name="Number of records") +
   theme(legend.position="bottom")
 
 
 # SAVE MAP
 
 # pdf to call the plot
-pdf(file = "MapOfAustralia.pdf")
+pdf(file = "Figure1.pdf")
 
 # Create the plot
 ausMap +
   geom_point(aes(x = Longitude, y = Latitude, size = records), shape = 20, colour = "red", data = lonlatAus) +
-  scale_size(range = c(1, 5), name="Number of records") +
+  scale_size(range = c(1, 15), name="Number of records") +
   theme(legend.position="bottom")
 
 # Create the file
 dev.off()
-
-
-
-
-
-
-
-
 
 
