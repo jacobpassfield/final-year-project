@@ -46,7 +46,7 @@ ausMap +
 # SAVE MAP
 
 # pdf to call the plot
-pdf(file = "Figure1.pdf")
+pdf(file = "figures/Figure1.pdf")
 
 # Create the plot
 ausMap +
