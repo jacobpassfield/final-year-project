@@ -37,7 +37,7 @@ map <- get_map(location = bbox, source = "stamen", maptype = "toner-lite")
 lonlatAus <- lonlat_data %>% 
   filter(bbox[1] <= Longitude, Longitude <= bbox[3], bbox[2] <= Latitude, Latitude <= bbox[4])
 # Overlaying geogroups onto map
-ausMap +
+ausGeo <- ausMap +
   geom_point(aes(x = Longitude, y = Latitude, size = records), shape = 20, colour = "red", data = lonlatAus) +
   scale_size(range = c(1, 15), name="Number of records") +
   theme(legend.position="bottom")
@@ -47,13 +47,8 @@ ausMap +
 
 # pdf to call the plot
 pdf(file = "figures/Figure1.pdf")
-
 # Create the plot
-ausMap +
-  geom_point(aes(x = Longitude, y = Latitude, size = records), shape = 20, colour = "red", data = lonlatAus) +
-  scale_size(range = c(1, 15), name="Number of records") +
-  theme(legend.position="bottom")
-
+ausGeo
 # Create the file
 dev.off()
 
