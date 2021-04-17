@@ -63,12 +63,6 @@ PWmmPlot2 <- ggplot(PW.pred.mm2) +
   theme_minimal() + 
   theme(legend.position="none")
 
-pdf(file = "figures/Figure9.pdf")
-PWmmPlot2
-dev.off()
-
-# Still validated?
-
 # Homegeneity.
 homoPW <- ggplot(PW.mm2, aes(x= .fitted, y= .resid)) + 
   geom_point(shape=1, size=2) +
@@ -86,11 +80,11 @@ normPW <- ggplot(PW.mm2, aes(x = .resid)) +
 # Independence.
 indPW <- ggplot(PW_data, aes(x = ScaledMeanSST, y = resid(PW.mm2))) +
   geom_point(shape = 1, size = 2) + 
-  labs(title = "Explanatory variable versus residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
+  labs(title = "Explanatory variable vs residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
   theme_classic()
 
 pdf(file = "figures/Figure10.pdf")
-(homoPW + normPW) / indPW + 
+PWmmPlot2 + (homoPW / normPW / indPW) + 
   plot_annotation(tag_levels = c("A", "B", "C")) &
   theme(plot.tag = element_text(face = 2, size = 15)) # & operator applies tag style to all plots
 dev.off()

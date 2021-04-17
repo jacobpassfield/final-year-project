@@ -29,10 +29,6 @@ TSDmmPlot <- ggplot(TSD.pred.mm) +
   theme(legend.position="none")
 # Slight increase!
 
-pdf(file = "figures/Maybe1.pdf")
-TSDmmPlot
-dev.off()
-
 # Validation
 
 # Homegeneity.
@@ -52,11 +48,11 @@ normTSD <- ggplot(TSD.mm, aes(x = .resid)) +
 # Independence.
 indTSD <- ggplot(TSD_data, aes(x = ScaledMeanSST, y = resid(TSD.mm))) +
   geom_point(shape = 1, size = 2) + 
-  labs(title = "Explanatory variable versus residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
+  labs(title = "Explanatory variable vs residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
   theme_classic()
 
-pdf(file = "figures/Maybe2.pdf")
-(homoTSD + normTSD) / indTSD + 
+pdf(file = "figures/Figure9.pdf")
+TSDmmPlot + (homoTSD / normTSD / indTSD) + 
   plot_annotation(tag_levels = c("A", "B", "C")) &
   theme(plot.tag = element_text(face = 2, size = 15)) # & operator applies tag style to all plots
 dev.off()
