@@ -196,22 +196,6 @@ library(ggeffects)
 
 PW.pred.mm <- ggpredict(PW.mm, terms = c("ScaledMeanSST")) # this gives overall predictions for the model
 
-# Plot the predictions 
-mmPlot <- ggplot(PW.pred.mm) + 
-  geom_line(aes(x = x, y = predicted), colour = "blue", size = 2) + # slope
-  geom_point(data = PW_data,  # adding the raw data (scaled values)
-             aes(x = ScaledMeanSST, y = SizeClass), alpha = 0.1, size = 3) + 
-  labs(y="Size class (cm)", x="Scaled Mean SST (°C)", 
-       title = "How temperature affects the body size of Pearly Wrasse",
-       subtitle = "Using a linear mixed-effects model") + 
-  theme_minimal() + 
-  theme(legend.position="none")
-# Decrease!
-
-pdf(file = "figures/Figure7.pdf")
-mmPlot
-dev.off()
-
 # Validation
 
 # Homegeneity.
@@ -234,8 +218,25 @@ ind2 <- ggplot(PW_data, aes(x = ScaledMeanSST, y = resid(PW.mm))) +
   labs(title = "Explanatory variable versus residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
   theme_classic()
 
-pdf(file = "figures/Figure8.pdf")
+pdf(file = "figures/Figure7.pdf")
 (homo2 + norm2) / ind2 + 
   plot_annotation(tag_levels = c("A", "B", "C")) &
   theme(plot.tag = element_text(face = 2, size = 15)) # & operator applies tag style to all plots
 dev.off()
+
+# Plot the predictions 
+mmPlot <- ggplot(PW.pred.mm) + 
+  geom_line(aes(x = x, y = predicted), colour = "blue", size = 2) + # slope
+  geom_point(data = PW_data,  # adding the raw data (scaled values)
+             aes(x = ScaledMeanSST, y = SizeClass), alpha = 0.1, size = 3) + 
+  labs(y="Size class (cm)", x="Scaled Mean SST (°C)", 
+       title = "How temperature affects the body size of Pearly Wrasse",
+       subtitle = "Using a linear mixed-effects model") + 
+  theme_minimal() + 
+  theme(legend.position="none")
+# Decrease!
+
+pdf(file = "figures/Figure8.pdf")
+mmPlot
+dev.off()
+
