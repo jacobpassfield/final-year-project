@@ -1,0 +1,235 @@
+library(tidyverse)
+library(broom.mixed)
+library(lme4)
+library(patchwork)
+
+load(file = "data/data.RData")
+data <- data %>% mutate(ScaledMeanSST = scale(MeanSST, center = T, scale = T))
+data$Geogroup <- factor(data$Geogroup)
+data$SurveyID <- factor(data$SurveyID)
+
+by_species <- data %>%
+  group_by(TaxonomicName) %>%
+  nest()
+
+dim(by_species)
+head(by_species)
+
+# Geogroup / SurveyID
+
+species_model <- function(df) {
+  lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup/SurveyID), REML=T, data = df)
+}
+
+by_species1 <- by_species %>%
+  mutate(model = map(data, species_model)) #byspecies$data 
+
+# Geogroup + SurveyID
+
+species_model2 <- function(df) {
+  lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup) + (1|SurveyID), REML=T, data = df)
+}
+
+by_species2 <- by_species %>%
+  mutate(model = map(data, species_model2)) #byspecies$data 
+
+# SurveyID
+
+species_model3 <- function(df) {
+  lmer(SizeClass ~ ScaledMeanSST + (1|SurveyID), REML=T, data = df)
+}
+
+by_species3 <- by_species %>%
+  mutate(model = map(data, species_model3)) #byspecies$data 
+
+# Use only SurveyID
+
+# Are assumptions still met for PW?
+
+PW_data <- data %>% filter(TaxonomicName %in% "Halichoeres margaritaceus")
+
+PW_data <- PW_data %>% mutate(ScaledMeanSST = scale(MeanSST, center = T, scale = T))
+
+PW_data$Geogroup <- factor(PW_data$Geogroup)
+PW_data$SurveyID <- factor(PW_data$SurveyID)
+
+PW.mm2 <- lmer(SizeClass ~ ScaledMeanSST + (1|SurveyID), REML = T, data = PW_data)
+
+PW.pred.mm2 <- ggpredict(PW.mm2, terms = c("ScaledMeanSST"))  # this gives overall predictions for the model
+
+PWmmPlot2 <- ggplot(PW.pred.mm2) + 
+  geom_line(aes(x = x, y = predicted), size = 2, colour = "blue") + # slope
+  geom_point(data = TSD_data,  # adding the raw data (scaled values)
+             aes(x = ScaledMeanSST, y = SizeClass), alpha = 0.1, size = 3) + 
+  labs(y="Size class (cm)", x="Scaled Mean SST (°C)", 
+       title = "How temperature affects the body size of Pearly Wrasse",
+       subtitle = "Using a linear mixed-effects model") + 
+  theme_minimal() + 
+  theme(legend.position="none")
+
+pdf(file = "figures/Figure9.pdf")
+PWmmPlot2
+dev.off()
+
+# Homegeneity.
+homoPW <- ggplot(PW.mm2, aes(x= .fitted, y= .resid)) + 
+  geom_point(shape=1, size=2) +
+  geom_hline(yintercept=0, col="red", linetype="dashed") +
+  geom_smooth(method = "loess", se=F) +
+  labs(title = "Residuals versus fitted values", y="Residuals", x="Fitted values") +
+  theme_classic()
+
+# Normality.
+normPW <- ggplot(PW.mm2, aes(x = .resid)) +
+  geom_histogram(bins = 10, fill = "white", colour = "black") +
+  labs(title = "Histogram of residuals", x = "Residuals", y = "Frequency") +
+  theme_classic()
+
+# Independence.
+indPE <- ggplot(PW_data, aes(x = ScaledMeanSST, y = resid(PW.mm))) +
+  geom_point(shape = 1, size = 2) + 
+  labs(title = "Explanatory variable versus residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
+  theme_classic()
+
+pdf(file = "figures/Figure10.pdf")
+(homoPW + normPW) / indPW + 
+  plot_annotation(tag_levels = c("A", "B", "C")) &
+  theme(plot.tag = element_text(face = 2, size = 15)) # & operator applies tag style to all plots
+dev.off()
+
+tidy <- by_species3 %>%
+  mutate(tidy = map(model, broom.mixed::tidy)) %>%
+  unnest(tidy, .drop = T)
+
+head(tidy)
+
+# Create data frame including species name and the estimate of the slope.
+
+SST_est <- tidy %>%
+  select(TaxonomicName, effect, term, estimate) %>%
+  filter(term %in% c("ScaledMeanSST"))
+
+head(SST_est)
+dim(SST_est)
+
+# Show the value of the estimate.
+
+index <- c(1:335)
+SSTestPlot <- SST_est %>%
+  ggplot(aes(index, estimate)) + geom_point() + geom_hline(yintercept = 0, colour = "red")
+
+pdf(file = "figures/Figure11.pdf")
+SSTestPlot
+dev.off()
+
+# What are the two points with an estimate greater than 15?
+
+# Shown on plot
+grt15 <- SST_est %>%
+  ggplot(aes(index, estimate, label=TaxonomicName)) + 
+  geom_point() + 
+  geom_hline(yintercept = 0, colour = "red") +
+  geom_text(aes(label = ifelse(estimate > 15, TaxonomicName, '')), size = 3, hjust= -0.1) +
+  theme_classic()
+
+pdf(file = "figures/Figure12.pdf")
+grt15
+dev.off()
+
+# Checking their summaries 
+DN_data <- filter(data, TaxonomicName %in% "Dactylophora nigricans")
+AG_data <- filter(data, TaxonomicName %in% "Achoerodus gouldii")
+
+DN.mm <- lmer(SizeClass ~ ScaledMeanSST + (1|SurveyID), REML=T, data = DN_data)
+AG.mm <- lmer(SizeClass ~ ScaledMeanSST + (1|SurveyID), REML=T, data = AG_data)
+
+# Homegeneity.
+homoDN <- ggplot(DN.mm, aes(x= .fitted, y= .resid)) + 
+  geom_point(shape=1, size=2) +
+  geom_hline(yintercept=0, col="red", linetype="dashed") +
+  geom_smooth(method = "loess", se=F) +
+  labs(title = "Residuals versus fitted values", y="Residuals", x="Fitted values") +
+  theme_classic()
+
+homoAG <- ggplot(AG.mm, aes(x= .fitted, y= .resid)) + 
+  geom_point(shape=1, size=2) +
+  geom_hline(yintercept=0, col="red", linetype="dashed") +
+  geom_smooth(method = "loess", se=F) +
+  labs(title = "Residuals versus fitted values", y="Residuals", x="Fitted values") +
+  theme_classic()
+
+# Normality.
+normDN <- ggplot(DN.mm, aes(x = .resid)) +
+  geom_histogram(bins = 10, fill = "white", colour = "black") +
+  labs(title = "Histogram of residuals", x = "Residuals", y = "Frequency") +
+  theme_classic()
+
+normAG <- ggplot(AG.mm, aes(x = .resid)) +
+  geom_histogram(bins = 10, fill = "white", colour = "black") +
+  labs(title = "Histogram of residuals", x = "Residuals", y = "Frequency") +
+  theme_classic()
+
+# Independence.
+indDN <- ggplot(DN_data, aes(x = ScaledMeanSST, y = resid(TSD.mm))) +
+  geom_point(shape = 1, size = 2) + 
+  labs(title = "Explanatory variable versus residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
+  theme_classic()
+
+indAG <- ggplot(AG_data, aes(x = ScaledMeanSST, y = resid(TSD.mm))) +
+  geom_point(shape = 1, size = 2) + 
+  labs(title = "Explanatory variable versus residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
+  theme_classic()
+
+pdf(file = "figures/Figure13.pdf")
+(homoDN + homoAG) / (normDN + normAG) / (indDN + indAG) 
+  plot_annotation(tag_levels = c("A", "B", "C", "D", "E", "F")) &
+  theme(plot.tag = element_text(face = 2, size = 15)) # & operator applies tag style to all plots
+dev.off()
+
+# Model validated. Just large estimates. Do not remove.
+
+# ROUNDED ESTIMATES TO A WHOLE NUMBER
+
+SST_est$round_est <- round(SST_est$estimate, digits =  0)
+
+# Temperature doesn't have a large range so the slope won't drastically change the 
+# body size if slope isn't drastic.
+
+nrow(subset(SST_est, round_est > 0)) # 105
+nrow(subset(SST_est, round_est == 0)) # 59
+nrow(subset(SST_est, round_est < 0)) # 171
+
+# INCREASE
+(105/335)*100 # 31.34328
+# NEITHER INCREASE NOR DECREASE
+(59/335)*100 # 17.61194
+# DECREASE
+(171/335)*100 # 51.04478
+
+# ROUNDED ESTIMATES TO THE NEAREST TENTH
+
+SST_est$round_est <- round(SST_est$estimate, digits =  0.5)
+
+nrow(subset(SST_est, round_est > 0)) # 129
+nrow(subset(SST_est, round_est == 0)) # 7
+nrow(subset(SST_est, round_est < 0)) # 199
+
+# INCREASE
+(129/335)*100 # 38.50746
+# NEITHER INCREASE NOR DECREASE
+(7/335)*100 # 2.089552
+# DECREASE
+(199/335)*100 # 59.40299
+
+# ESTIMATES LEFT ALONE
+
+nrow(subset(SST_est, estimate > 0)) # 132
+nrow(subset(SST_est, estimate == 0)) # 0
+nrow(subset(SST_est, estimate < 0)) # 203
+
+# INCREASE
+(132/335)*100 # 39.40299
+# NEITHER INCREASE NOR DECREASE
+(0/335)*100 # 0
+# DECREASE
+(203/335)*100 # 60.59701

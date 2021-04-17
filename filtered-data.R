@@ -58,12 +58,4 @@ speciesCount[329,] # Trachurus novaezelandiae 914584
 which.min(speciesCount$count) # 142
 speciesCount[142,] # Halichoeres margaritaceus  1008
 
-# Checking to see if data was filtered the way described
-dim(PW_data) # 1008 19
-# More than 1000 observations...
-length(unique(PW_data$Geogroup)) # 37
-# ...in at least 10 geographic cells...
-length(unique(PW_data$Year)) # 11
-# ...over at least 5 years.
-
 # Smallest number observations makes it easier for analysis.

@@ -17,6 +17,16 @@ load(file = "data/data.RData")
 # Create data frame containing only observations from halichoeres margaritaceus
 PW_data <- data %>% filter(TaxonomicName %in% "Halichoeres margaritaceus")
 
+# Checking to see if data was filtered the way described
+dim(PW_data) # 1008 19
+# More than 1000 observations...
+length(unique(PW_data$Geogroup)) # 37
+# ...in at least 10 geographic cells...
+length(unique(PW_data$Year)) # 11
+# ...over at least 5 years.
+
+length(unique(PW_data$SurveyID)) # 79
+
 # SIMPLE LINEAR REGRESSION
 
 # Inspecting explanatory variable
