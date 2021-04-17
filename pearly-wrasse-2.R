@@ -164,7 +164,7 @@ BIC(mm1, mm2, mm3)
 # mm2  4 4747.702
 # mm3  4 4375.641
 
-mm4  <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup/Year/SurveyID), REML = T, data = PW_data) # failed to converge
+mm4 <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup/Year/SurveyID), REML = T, data = PW_data) # failed to converge
 mm5 <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup/SurveyID), REML = T, data = PW_data)
 mm6 <- lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup/Year), REML = T, data = PW_data)
 mm7 <- lmer(SizeClass ~ ScaledMeanSST + (1|Year/SurveyID), REML = T, data = PW_data)
@@ -175,6 +175,8 @@ BIC(mm5, mm6, mm7)
 # mm5  5 4369.391
 # mm6  5 4394.367
 # mm7  5 4380.878
+
+# summary("mm[i]")
 
 # Makes sense YearIndex is not used as spread wasn't drastically different.
 # Interesting about MM3 < MM1 Geogroup too but survey index encapsulates day and geogroup.
