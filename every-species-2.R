@@ -25,23 +25,16 @@ species_model <- function(df) {
 by_species1 <- by_species %>%
   mutate(model = map(data, species_model)) #byspecies$data 
 
-# Geogroup + SurveyID
-
-species_model2 <- function(df) {
-  lmer(SizeClass ~ ScaledMeanSST + (1|Geogroup) + (1|SurveyID), REML=T, data = df)
-}
-
-by_species2 <- by_species %>%
-  mutate(model = map(data, species_model2)) #byspecies$data 
-
 # SurveyID
 
-species_model3 <- function(df) {
+species_model2 <- function(df) {
   lmer(SizeClass ~ ScaledMeanSST + (1|SurveyID), REML=T, data = df)
 }
 
-by_species3 <- by_species %>%
+by_species2 <- by_species %>%
   mutate(model = map(data, species_model3)) #byspecies$data 
+
+head(by_species2)
 
 # Use only SurveyID
 
@@ -58,7 +51,7 @@ PWmmPlot2 <- ggplot(PW.pred.mm2) +
   geom_point(data = PW_data,  # adding the raw data (scaled values)
              aes(x = ScaledMeanSST, y = SizeClass), alpha = 0.1, size = 3) + 
   labs(y="Size class (cm)", x="Scaled Mean SST (°C)", 
-       title = "How temperature affects the body size of Pearly Wrasse",
+       title = "Temperature versus size class",
        subtitle = "Using a linear mixed-effects model") + 
   theme_minimal() + 
   theme(legend.position="none")
@@ -83,7 +76,9 @@ indPW <- ggplot(PW_data, aes(x = ScaledMeanSST, y = resid(PW.mm2))) +
   labs(title = "Explanatory variable vs residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
   theme_classic()
 
-pdf(file = "figures/Figure10.pdf")
+summary(PW.mm2)
+
+pdf(file = "figures/Figure9.pdf")
 PWmmPlot2 + (homoPW / normPW / indPW) + 
   plot_annotation(tag_levels = c("A", "B", "C")) &
   theme(plot.tag = element_text(face = 2, size = 15)) # & operator applies tag style to all plots
@@ -91,7 +86,7 @@ dev.off()
 
 # Phew.
 
-tidy <- by_species3 %>%
+tidy <- by_species2 %>%
   mutate(tidy = map(model, broom.mixed::tidy)) %>%
   unnest(tidy, .drop = T)
 
@@ -127,10 +122,10 @@ grt15 <- SST_est %>%
   geom_point() + 
   geom_hline(yintercept = 0, colour = "red") +
   geom_text(aes(label = ifelse(estimate > 15, TaxonomicName, '')), size = 3, hjust= -0.1) +
-  labs(y = "Estimated coefficient for the sea surface temperature", x = "Index") +
+  labs(y = "Estimated coefficient for sea surface temperature", x = "Index") +
   theme_classic()
 
-pdf(file = "figures/Figure11.pdf")
+pdf(file = "figures/Figure10.pdf")
 grt15
 dev.off()
 
@@ -170,41 +165,23 @@ normAG <- ggplot(AG.mm, aes(x = .resid)) +
 # Independence.
 indDN <- ggplot(DN_data, aes(x = ScaledMeanSST, y = resid(DN.mm))) +
   geom_point(shape = 1, size = 2) + 
-  labs(title = "Explanatory variable versus residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
+  labs(title = "Explanatory variable vs residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
   theme_classic()
 
 indAG <- ggplot(AG_data, aes(x = ScaledMeanSST, y = resid(AG.mm))) +
   geom_point(shape = 1, size = 2) + 
-  labs(title = "Explanatory variable versus residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
+  labs(title = "Explanatory variable vs residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
   theme_classic()
 
-pdf(file = "figures/Figure12.pdf")
+pdf(file = "figures/Figure11.pdf")
 (homoDN + homoAG) / (normDN + normAG) / (indDN + indAG) &
   plot_annotation(tag_levels = c("A", "B", "C", "D", "E", "F")) &
   theme(plot.tag = element_text(face = 2, size = 15)) # & operator applies tag style to all plots
 dev.off()
 
 # Keep.
-# Catious to remove as observations with extreme values in ecology is interesting.
+# Cautious to remove as observations with extreme values in ecology is interesting.
 # Normality and independent assumptions are good.
-
-# ROUNDED ESTIMATES TO A WHOLE NUMBER
-
-SST_est$round_est <- round(SST_est$estimate, digits =  0)
-
-# Temperature doesn't have a large range so the slope won't drastically change the 
-# body size if slope isn't drastic.
-
-nrow(subset(SST_est, round_est > 0)) # 105
-nrow(subset(SST_est, round_est == 0)) # 59
-nrow(subset(SST_est, round_est < 0)) # 171
-
-# INCREASE
-(105/335)*100 # 31.34328
-# NEITHER INCREASE NOR DECREASE
-(59/335)*100 # 17.61194
-# DECREASE
-(171/335)*100 # 51.04478
 
 # ROUNDED ESTIMATES TO THE NEAREST TENTH
 
@@ -220,16 +197,3 @@ nrow(subset(SST_est, round_est < 0)) # 199
 (7/335)*100 # 2.089552
 # DECREASE
 (199/335)*100 # 59.40299
-
-# ESTIMATES LEFT ALONE
-
-nrow(subset(SST_est, estimate > 0)) # 132
-nrow(subset(SST_est, estimate == 0)) # 0
-nrow(subset(SST_est, estimate < 0)) # 203
-
-# INCREASE
-(132/335)*100 # 39.40299
-# NEITHER INCREASE NOR DECREASE
-(0/335)*100 # 0
-# DECREASE
-(203/335)*100 # 60.59701

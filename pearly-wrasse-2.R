@@ -190,7 +190,7 @@ BIC(mm5, mm6, mm7)
 # PW.lm1     1  3 4748.695 4763.436 -2371.347                        
 # PW.mm1     2  5 4344.812 4369.381 -2167.406 1 vs 2 407.8828  <.0001
 
-PW.mm <- mm5
+PW.mm <- mm6
 
 library(ggeffects)
 
@@ -239,4 +239,6 @@ mmPlot <- ggplot(PW.pred.mm) +
 pdf(file = "figures/Figure8.pdf")
 mmPlot
 dev.off()
+
+summary(PW.mm)
 

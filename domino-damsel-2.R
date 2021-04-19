@@ -51,7 +51,7 @@ indTSD <- ggplot(TSD_data, aes(x = ScaledMeanSST, y = resid(TSD.mm))) +
   labs(title = "Explanatory variable vs residuals", x = "Scaled Mean SST (°C)", y = "Residuals") +
   theme_classic()
 
-pdf(file = "figures/Figure9.pdf")
+pdf(file = "figures/NotNeeded.pdf")
 TSDmmPlot + (homoTSD / normTSD / indTSD) + 
   plot_annotation(tag_levels = c("A", "B", "C")) &
   theme(plot.tag = element_text(face = 2, size = 15)) # & operator applies tag style to all plots
