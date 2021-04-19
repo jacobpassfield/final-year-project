@@ -1,4 +1,4 @@
-# third-year-project
+# final-year-project
 Data analysis in fisheries science.
 
 The files: filtered-data, australia-map, pearly-wrasse-2 and every-sepecies-2 contain the code to
