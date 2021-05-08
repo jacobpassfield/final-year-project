@@ -46,10 +46,9 @@ ausGeo <- ausMap +
 # SAVE MAP
 
 # pdf to call the plot
-pdf(file = "figures/Figure1.pdf")
+pdf(file = "figures/figure-1.pdf")
 # Create the plot
 ausGeo
 # Create the file
 dev.off()
-
 

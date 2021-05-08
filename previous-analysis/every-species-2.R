@@ -32,7 +32,7 @@ species_model2 <- function(df) {
 }
 
 by_species2 <- by_species %>%
-  mutate(model = map(data, species_model3)) #byspecies$data 
+  mutate(model = map(data, species_model2)) #byspecies$data 
 
 head(by_species2)
 

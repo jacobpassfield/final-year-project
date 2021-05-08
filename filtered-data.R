@@ -44,18 +44,22 @@ sort(unique(data$Year))
 # 1992 1993 1994 1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010
 # 2011 2012 2013 2014 2015 2016 2017 2018
 
-# WHY PEARLY WRASSE?
+# WHY WHITEFIN SURGEONFISH?
 
 speciesCount <- data %>%
   group_by(TaxonomicName) %>%
-  summarise(count = n())
+  summarise(count = n()) %>%
+  arrange(count)
 
-# Find species with maximum observations
-which.max(speciesCount$count) # 329
-speciesCount[329,] # Trachurus novaezelandiae 914584
+# Low number of observations that make process time in R quicker
+# Signifcant correlation (found later in the report)
 
-# Find species with minimum observations
-which.min(speciesCount$count) # 142
-speciesCount[142,] # Halichoeres margaritaceus  1008
-
-# Smallest number observations makes it easier for analysis.
+# Checking to see if data was filtered the way described
+WS_data <- data %>% filter(TaxonomicName %in% "Acanthurus albipectoralis")
+dim(WS_data) # 1090 19
+# More than 1000 observations...
+length(unique(WS_data$Geogroup)) # 30
+# ...in at least 10 geographic cells...
+length(unique(WS_data$Year)) # 10
+# ...over at least 5 years.
+length(unique(WS_data$SurveyID)) # 87
