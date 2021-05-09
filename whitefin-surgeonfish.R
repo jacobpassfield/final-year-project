@@ -95,7 +95,7 @@ geolmPlot <- ggplot(WS_data, aes(x=ScaledMeanSST, y=SizeClass)) +
   facet_wrap(~Geogroup) +
   theme_light() +
   theme(axis.title = element_text(size = 15),
-        axis.text.x = element_text(size = 13),
+        axis.text.x = element_text(size = 10),
         axis.text.y = element_text(size = 15),
         strip.text = element_text(size = 15)) +
   theme(legend.position = "none") +
