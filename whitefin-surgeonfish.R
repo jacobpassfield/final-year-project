@@ -91,10 +91,13 @@ dev.off()
 
 # Running seperate analyses using cell to demonstare
 geolmPlot <- ggplot(WS_data, aes(x=ScaledMeanSST, y=SizeClass)) +
-  geom_point() +
+  geom_point(alpha = 0.1) +
   facet_wrap(~Geogroup) +
   theme_light() +
-  theme_parameters +
+  theme(axis.title = element_text(size = 15),
+        axis.title.x = element_text(size = 13),
+        axis.text.y = element_text(size = 15),
+        strip.text = element_text(size = 15)) +
   theme(legend.position = "none") +
   labs(y="Size class (cm)", x="Scaled mean SST (°C)")
 
