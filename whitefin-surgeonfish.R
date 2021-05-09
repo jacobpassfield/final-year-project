@@ -130,7 +130,7 @@ BIC(mm1, mm2, mm3, mm4, mm5, mm6, mm7)
 # mm6  5 5341.405 < < <
 # mm7  5 5341.479
 
-# mm7 lowest BIC and so best model
+# mm6 lowest BIC and so best model
 WS.mm <- mm6
 
 # Model validation graphs
