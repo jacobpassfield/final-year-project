@@ -91,7 +91,7 @@ dev.off()
 
 # Running seperate analyses using cell to demonstare
 geolmPlot <- ggplot(WS_data, aes(x=ScaledMeanSST, y=SizeClass)) +
-  geom_point(alpha = 0.1) +
+  geom_point(alpha = 0.2) +
   facet_wrap(~Geogroup) +
   theme_light() +
   theme(axis.title = element_text(size = 15),
