@@ -156,12 +156,12 @@ norm.mm <- ggplot(WS.mm, aes(x = .resid)) +
 re.geo <- ranef(WS.mm)$Geogroup$`(Intercept)`
 qq1.mm <- ggqqplot(re.geo, conf.int.level = 0, shape = 19) +
   theme_parameters +
-  labs(title = "Normal Q-Q plot", subtitle = "Random effect - cell", x = "Theoretical quantiles", y = "Sample quantiles")
+  labs(title = "Q-Q plot", subtitle = "Random effect - cell", x = "Theoretical quantiles", y = "Sample quantiles")
 # SurveyID:Geogroup
 re.surgeo <- ranef(WS.mm)$`SurveyID:Geogroup`$`(Intercept)`
 qq2.mm <- ggqqplot(re.surgeo, conf.int.level = 0, shape = 19) +
   theme_parameters +
-  labs(title = "Normal Q-Q plot", subtitle = "Random effect - cell/survey", x = "Theoretical quantiles", y = "Sample quantiles")
+  labs(title = "Q-Q plot", subtitle = "Random effect - cell/survey", x = "Theoretical quantiles", y = "Sample quantiles")
 
 # Save
 pdf(file = "figures/figure-6.pdf")

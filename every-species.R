@@ -100,11 +100,11 @@ norm.WS <- ggplot(WS.mm2, aes(x = .resid)) +
 re.WS <- ranef(WS.mm2)$SurveyID$`(Intercept)`
 qq.WS <- ggqqplot(re.WS, conf.int.level = 0, shape = 19) +
   theme_parameters +
-  labs(title = "Normal Q-Q plot", subtitle = "Random effect - survey", x = "Theoretical quantiles", y = "Sample quantiles")
+  labs(title = "Q-Q plot", subtitle = "Random effect - survey", x = "Theoretical quantiles", y = "Sample quantiles")
 # Obtaining estimates
 summary(WS.mm2)
 # alpha: 22.4730, beta: 3.1061, residual variance: 2.424^2, 
-# survey variance: 5.89^2, p-value: 1.03e-09
+# survey variance: 5.589^2, p-value: 1.03e-09
 # The resulting p-value for beta is 1.03e-09 < 0.05 and so beta is significant.
 
 # Save
@@ -191,11 +191,11 @@ norm.DN <- ggplot(DN.mm, aes(x = .resid)) +
 re.AG <- ranef(AG.mm)$SurveyID$`(Intercept)`
 qq.AG <- ggqqplot(re.AG, conf.int.level = 0, shape = 19) +
   theme_parameters +
-  labs(title = "Normal Q-Q plot", subtitle = "Random effect - survey", x = "Theoretical quantiles", y = "Sample quantiles")
+  labs(title = "Q-Q plot", subtitle = "Random effect - survey", x = "Theoretical quantiles", y = "Sample quantiles")
 re.DN <- ranef(DN.mm)$SurveyID$`(Intercept)`
 qq.DN <- ggqqplot(re.DN, conf.int.level = 0, shape = 19) +
   theme_parameters +
-  labs(title = "Normal Q-Q plot", subtitle = "Random effect - survey", x = "Theoretical quantiles", y = "Sample quantiles")
+  labs(title = "Q-Q plot", subtitle = "Random effect - survey", x = "Theoretical quantiles", y = "Sample quantiles")
 # Shapiro-Test for normality
 shapiro.test(re.AG) # p-value < 2.2e-16
 shapiro.test(re.DN) # p-value < 2.2e-16
@@ -212,8 +212,8 @@ nrow(subset(sig_est, estimate > 0)) # 70
 nrow(subset(sig_est, estimate == 0)) # 0
 nrow(subset(sig_est, estimate < 0)) # 151
 # Positive correlation
-(70/335)*100 # 20.89552
+(70/335)*100 # 20.89552 -- 21
 # No correlation
-(dim(notsig_est)[1]/335)*100 # 34.02985
+(dim(notsig_est)[1]/335)*100 # 34.02985 -- 34
 # Negative correlation
-(151/335)*100 # 45.07463
+(151/335)*100 # 45.07463 -- 45
